@@ -7,6 +7,8 @@ namespace WildberriesTask
 {
     internal class Program
     {
+        const string JwtToken = "JhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MTE0Nzk5NTQsInZlcnNpb24iOjIsInVzZXIiOiIxNDkyODQ2NjkiLCJzaGFyZF9rZXkiOiIyMyIsImNsaWVudF9pZCI6IndiIiwic2Vzc2lvbl9pZCI6IjRlM2I0ZjRlNTk3NDQyYWFhNzRmN2IwODA5NGE4YjBkIiwidXNlcl9yZWdpc3RyYXRpb25fZHQiOjE3MTE0NTIxMjksInZhbGlkYXRpb25fa2V5IjoiNGY5NWY3N2FhZWJhODFiZjQxN2EwOGVhNzI0NGU4N2YxZDMwNThhMmExZTVlNzA3NWE5YTljMjcxNDI2ODViMSIsInBob25lIjoiemNNcmdXenJraU5RQUZUbEpjallhQT09In0.E4XCp0LfhDDzL1rlXdmd8k1z8BbZJoNXJEUiQUCvGaJQ47mWgxTYkM8yWqWId0n9A8Y79aTq_NxUkiWPeZGLjnwMKM6vN9aWU_puP35360CuBXZOQJHVO17OBHjpKgh1vHNH1OQg8o1o5wrzmC3KzwRaXa7pFSk4fgWatUv5sSoXVZ_rGrQyWwQwkylqqa24qZOP3E5sEHLy5zqVgGF3Z20fHmjOGoQiko8lXzBvbzg6D0fdzorIWgy-6RNhsdFNDCjsZUNMafxBg5qN_s6H1mx3Mlp5jFFIjTsHNocuS7X9teMBOw7NrRiyNWe2gZBD7HglLGCLmS8KeW5VD707dw";
+        const string Origin = "https://www.wildberries.ru";
         static async Task Main(string[] args)
         {
             Console.WriteLine("Корзина до добавления товара: ");
@@ -31,7 +33,7 @@ namespace WildberriesTask
             Console.WriteLine("Номенклатура: " + nomenclature);
 
             string optionId = match.Groups["size"].Success ? match.Groups["size"].Value : await GetOptionIdAsync(nomenclature);
-            Console.WriteLine("Размер: " + optionId);
+            Console.WriteLine("Id размера: " + optionId);
 
             var result = await CardInBasketAsync(nomenclature, optionId);
 
@@ -55,17 +57,17 @@ namespace WildberriesTask
         {
             using HttpClient client = new HttpClient();
 
-            var uri = "https://cart-storage-api.wildberries.ru/api/basket/sync?ts=1711572511992&device_id=site_a5c8bb9c64fd462cb302c769126dcec8";
+            var url = "https://cart-storage-api.wildberries.ru/api/basket/sync?ts=1711572511992&device_id=site_a5c8bb9c64fd462cb302c769126dcec8";
 
-            using var request = new HttpRequestMessage(HttpMethod.Post, uri);
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
             // тип принимаемого контента
             request.Headers.Add("Accept", "*/*");
             // допустимые языки для ответа
             request.Headers.Add("Accept-language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
             // jwt токен
-            request.Headers.Add("Authorization", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MTE0Nzk5NTQsInZlcnNpb24iOjIsInVzZXIiOiIxNDkyODQ2NjkiLCJzaGFyZF9rZXkiOiIyMyIsImNsaWVudF9pZCI6IndiIiwic2Vzc2lvbl9pZCI6IjRlM2I0ZjRlNTk3NDQyYWFhNzRmN2IwODA5NGE4YjBkIiwidXNlcl9yZWdpc3RyYXRpb25fZHQiOjE3MTE0NTIxMjksInZhbGlkYXRpb25fa2V5IjoiNGY5NWY3N2FhZWJhODFiZjQxN2EwOGVhNzI0NGU4N2YxZDMwNThhMmExZTVlNzA3NWE5YTljMjcxNDI2ODViMSIsInBob25lIjoiemNNcmdXenJraU5RQUZUbEpjallhQT09In0.E4XCp0LfhDDzL1rlXdmd8k1z8BbZJoNXJEUiQUCvGaJQ47mWgxTYkM8yWqWId0n9A8Y79aTq_NxUkiWPeZGLjnwMKM6vN9aWU_puP35360CuBXZOQJHVO17OBHjpKgh1vHNH1OQg8o1o5wrzmC3KzwRaXa7pFSk4fgWatUv5sSoXVZ_rGrQyWwQwkylqqa24qZOP3E5sEHLy5zqVgGF3Z20fHmjOGoQiko8lXzBvbzg6D0fdzorIWgy-6RNhsdFNDCjsZUNMafxBg5qN_s6H1mx3Mlp5jFFIjTsHNocuS7X9teMBOw7NrRiyNWe2gZBD7HglLGCLmS8KeW5VD707dw");
+            request.Headers.Add("Authorization", $"Bearer {JwtToken}");
             // домен
-            request.Headers.Add("Origin", "https://www.wildberries.ru");
+            request.Headers.Add("Origin", Origin);
             // источник запроса
             request.Headers.Add("Referer", "https://www.wildberries.ru/lk/basket");
             // информация о клиенте
@@ -123,17 +125,17 @@ namespace WildberriesTask
         {
             using HttpClient client = new HttpClient();
 
-            var uri = "https://cart-storage-api.wildberries.ru/api/basket/sync?ts=1711570395313&device_id=site_a5c8bb9c64fd462cb302c769126dcec8";
+            var url = "https://cart-storage-api.wildberries.ru/api/basket/sync?ts=1711570395313&device_id=site_a5c8bb9c64fd462cb302c769126dcec8";
 
-            using var request = new HttpRequestMessage(HttpMethod.Post, uri);
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
             // тип принимаемого контента
             request.Headers.Add("Accept", "*/*");
             // допустимые языки для ответа
             request.Headers.Add("Accept-language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
             // jwt токен
-            request.Headers.Add("Authorization", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MTE0Nzk5NTQsInZlcnNpb24iOjIsInVzZXIiOiIxNDkyODQ2NjkiLCJzaGFyZF9rZXkiOiIyMyIsImNsaWVudF9pZCI6IndiIiwic2Vzc2lvbl9pZCI6IjRlM2I0ZjRlNTk3NDQyYWFhNzRmN2IwODA5NGE4YjBkIiwidXNlcl9yZWdpc3RyYXRpb25fZHQiOjE3MTE0NTIxMjksInZhbGlkYXRpb25fa2V5IjoiNGY5NWY3N2FhZWJhODFiZjQxN2EwOGVhNzI0NGU4N2YxZDMwNThhMmExZTVlNzA3NWE5YTljMjcxNDI2ODViMSIsInBob25lIjoiemNNcmdXenJraU5RQUZUbEpjallhQT09In0.E4XCp0LfhDDzL1rlXdmd8k1z8BbZJoNXJEUiQUCvGaJQ47mWgxTYkM8yWqWId0n9A8Y79aTq_NxUkiWPeZGLjnwMKM6vN9aWU_puP35360CuBXZOQJHVO17OBHjpKgh1vHNH1OQg8o1o5wrzmC3KzwRaXa7pFSk4fgWatUv5sSoXVZ_rGrQyWwQwkylqqa24qZOP3E5sEHLy5zqVgGF3Z20fHmjOGoQiko8lXzBvbzg6D0fdzorIWgy-6RNhsdFNDCjsZUNMafxBg5qN_s6H1mx3Mlp5jFFIjTsHNocuS7X9teMBOw7NrRiyNWe2gZBD7HglLGCLmS8KeW5VD707dw");
+            request.Headers.Add("Authorization", $"Bearer {JwtToken}");
             // домен
-            request.Headers.Add("Origin", "https://www.wildberries.ru");
+            request.Headers.Add("Origin", Origin);
             // источник запроса
             request.Headers.Add("Referer", "https://www.wildberries.ru/lk");
             // информация о клиенте
@@ -144,7 +146,7 @@ namespace WildberriesTask
             request.Headers.Add("Sec-fetch-mode", "cors");
             request.Headers.Add("Sec-fetch-site", "same-site");
             request.Headers.Add("User-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36");
-            // chrt_id - option_id,
+            // chrt_id - option_id в разделе размер,
             // cod_1s - номенклатура,
             // client - время добавления в корзину,
             // target_utl - откуда на карточку пришел пользователь, 
