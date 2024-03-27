@@ -11,6 +11,42 @@ namespace WildberriesTask
         {
             Console.WriteLine("Корзина до добавления товара: ");
 
+            var basket = await GetBasketAsync();
+
+            Console.WriteLine(basket + "\n");
+
+            Console.WriteLine("Введите ссылку на карточку:");
+            string cardUrl = GetString();
+
+            Regex regex = new Regex(@"catalog\/(?<nomenclature>\d+)\/detail\.aspx(\?size=(?<size>\d+))?");
+            Match match = regex.Match(cardUrl);
+
+            if (!match.Success)
+            {
+                Console.WriteLine("Введена неверная ссылка!");
+                return;
+            }
+
+            string nomenclature = match.Groups["nomenclature"].Value;
+            Console.WriteLine("Номенклатура: " + nomenclature);
+
+            string optionId = match.Groups["size"].Success ? match.Groups["size"].Value : await GetOptionIdAsync(nomenclature);
+            Console.WriteLine("Размер: " + optionId);
+
+            var result = await CardInBasketAsync(nomenclature, optionId);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Что-то пошло не так. Товар не был добавлен в корзину!");
+                return;
+            }
+
+            Console.WriteLine("Корзина после добавления товара: ");
+
+            basket = await GetBasketAsync();
+
+            Console.WriteLine(basket + "\n");
+        }
         /// <summary>
         /// Метод получающий информацию о карточках находящихся в корзине
         /// </summary>
